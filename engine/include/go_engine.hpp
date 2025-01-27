@@ -19,7 +19,6 @@ class GoEngine {
 public:
     GoEngine(int size);
     int getBoardSize() const;
-    // bool isStoneAt(int x, int y, Stone stone) const;
     Stone getStoneAt(int x, int y) const;
     bool placeStone(int x, int y, Stone stone);
     bool isValidMove(int x, int y, Stone stone) const;
