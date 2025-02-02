@@ -191,6 +191,30 @@ Captures findCaptures(const Board board, const Move move) {
     return capturedGroups;
 }
 
+Board applyCapturesAndMove(const Board board, const Move move, const Captures captures) {
+    const int size = board.size();
+    Board outBoard(size, std::vector<Stone>(size, EMPTY));
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+           if (move.row == i && move.col == j) {
+               outBoard[i][j] = move.side;
+           } else {
+               outBoard[i][j] = board[i][j];
+           }
+        }
+    }
+
+    for (const auto& group : captures) {
+        for (const auto& pos : group) {
+            outBoard[pos.first][pos.second] = EMPTY;
+        }
+    }
+
+    return outBoard;
+}
+
+
 TEST(GoEngineTest, BlankBoardBlackPasses) {
   auto [b, m] = parseGoBoard("- - - - - - - - -" \
                              "- - - - - - - - -" \
@@ -265,7 +289,6 @@ TEST(GoEngineTest, BlackCapturesOneWhiteStone) {
                                  "- - - - - - - - -");
 }
 
-/*
 TEST(GoEngineTest, KoRule) {
   auto [b1, m1] = parseGoBoard("- - - - - - - - -" \
                                "- - w - - - - - -" \
@@ -285,9 +308,7 @@ std::cout << "printBoard:\n" << printBoard(b1, true) << std::endl;
   EXPECT_EQ(c1.size(), 1);
   // verify the number of stones
   EXPECT_EQ(c1.at(0).size(), 1);
-
-std::cout << "printCaptures:\n" << printCaptures(b1, c1, true) << std::endl;
-
+//std::cout << "printCaptures:\n" << printCaptures(b1, c1, true) << std::endl;
   EXPECT_EQ(printCaptures(b1, c1), "- - - - - - - - -" \
                                    "- - - - - - - - -" \
                                    "- - - - - - - - -" \
@@ -297,8 +318,19 @@ std::cout << "printCaptures:\n" << printCaptures(b1, c1, true) << std::endl;
                                    "- - - - - - - - -" \
                                    "- - - - - - - - -" \
                                    "- - - - - - - - -");
+
+  auto b2 = applyCapturesAndMove(b1, m1, c1);
+//std::cout << "printBoard:\n" << printBoard(b2, true) << std::endl;
+  EXPECT_EQ(printBoard(b2, true), "- - - - - - - - -" \
+                                  "- - w - - - - - -" \
+                                  "- w b w - - - - -" \
+                                  "- b - b - - - - -" \
+                                  "- - b - - - - - -" \
+                                  "- - - - - - - - -" \
+                                  "- - - - - - - - -" \
+                                  "- - - - - - - - -" \
+                                  "- - - - - - - - -");
 }
-*/
 
 TEST(GoEngineTest, BlackCapturesFourWhiteStones) {
   auto [b, m] = parseGoBoard("w - - - - - - - w" \
